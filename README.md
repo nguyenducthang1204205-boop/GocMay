@@ -63,7 +63,7 @@ Sau khi có link, ghi tên miền vào file `.env.production` (`NEXT_PUBLIC_SITE
 
 Cloudflare tự lấy code từ GitHub và chạy `npm run cf:deploy` mỗi khi có code mới trên nhánh `main` — không cần tạo token hay khoá nào.
 
-Cài một lần: Cloudflare → **Workers & Pages** → worker **goc-may** → **Settings** → **Build** → **Connect** → chọn repo GitHub, rồi:
+Cài một lần: Cloudflare → **Workers & Pages** → worker **gocmay** → **Settings** → **Build** → **Connect** → chọn repo GitHub, rồi:
 
 | Ô | Giá trị |
 | --- | --- |

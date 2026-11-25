@@ -16,7 +16,7 @@ interface __BaseEnv_CloudflareEnv {
 	R2_SECRET_ACCESS_KEY: string;
 	R2_BUCKET: string;
 	R2_PUBLIC_URL: string;
-	WORKER_SELF_REFERENCE: Fetcher /* goc-may */;
+	WORKER_SELF_REFERENCE: Fetcher /* gocmay */;
 }
 declare namespace Cloudflare {
 	interface Env extends __BaseEnv_CloudflareEnv {}

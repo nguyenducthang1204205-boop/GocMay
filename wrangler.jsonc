@@ -2,7 +2,7 @@
 // Xem hướng dẫn đầy đủ trong README — mục "Triển khai lên Cloudflare".
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "goc-may",
+  "name": "gocmay",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -11,12 +11,12 @@
     "binding": "ASSETS"
   },
   "observability": { "enabled": true },
-  // Web chạy ở https://goc-may.<tài-khoản>.workers.dev. Gắn tên miền riêng: thêm "routes".
+  // Web chạy ở https://gocmay.<tài-khoản>.workers.dev. Gắn tên miền riêng: thêm "routes".
   "workers_dev": true,
   "preview_urls": false,
 
   // Worker tự gọi chính nó để làm mới trang đã cache
-  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "goc-may" }],
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "gocmay" }],
 
   // Một database D1 dùng cho cả dữ liệu web (DB) và bảng tag cache của Next.js.
   // database_id được `npm run cf:setup` điền tự động.
