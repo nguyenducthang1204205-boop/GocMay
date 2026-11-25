@@ -71,6 +71,10 @@ function readDotEnv(file) {
 const tail = (res, n = 15) => `${res.stderr}\n${res.stdout}`.trim().split(/\r?\n/).slice(-n).join("\n");
 
 function ensureLogin() {
+  // Chạy trên máy chủ build (Cloudflare Workers Builds / CI): đã có sẵn token, không cần đăng nhập.
+  // Token đó có thể không có quyền đọc thông tin người dùng nên bỏ qua bước "whoami";
+  // nếu token thiếu quyền, các lệnh sau sẽ báo lỗi cụ thể.
+  if (process.env.CLOUDFLARE_API_TOKEN) return;
   const res = wrangler(["whoami"], { capture: true });
   if (!res.ok || /not authenticated|not logged in/i.test(res.stdout + res.stderr)) {
     fail(

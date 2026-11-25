@@ -59,20 +59,21 @@ npm run cf:deploy        # build và đưa web lên — link *.workers.dev hiệ
 
 Sau khi có link, ghi tên miền vào file `.env.production` (`NEXT_PUBLIC_SITE_URL=https://…`) rồi deploy lại để sitemap/ảnh chia sẻ dùng đúng địa chỉ.
 
-### Tự deploy từ GitHub
+### Tự deploy từ GitHub (Cloudflare Workers Builds)
 
-Mỗi lần đẩy code lên nhánh `main`, GitHub Actions (`.github/workflows/deploy.yml`) tự chạy `npm run cf:deploy`.
-Xem tiến trình ở tab **Actions** của repo; muốn deploy lại mà không sửa code thì bấm **Run workflow**.
+Cloudflare tự lấy code từ GitHub và chạy `npm run cf:deploy` mỗi khi có code mới trên nhánh `main` — không cần tạo token hay khoá nào.
 
-Cài một lần — vào repo GitHub → **Settings → Secrets and variables → Actions → New repository secret**:
+Cài một lần: Cloudflare → **Workers & Pages** → worker **goc-may** → **Settings** → **Build** → **Connect** → chọn repo GitHub, rồi:
 
-| Secret | Lấy ở đâu |
+| Ô | Giá trị |
 | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens → Create Token → mẫu **Edit Cloudflare Workers**, thêm quyền **Account · D1 · Edit** |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare → Workers & Pages → cột phải, mục **Account ID** |
+| Branch | `main` |
+| Build command | *(để trống)* |
+| Deploy command | `npm run cf:deploy` |
+| Builds for non-production branches | tắt |
 
-Đổi tên miền: thêm biến `SITE_URL` ở tab **Variables** (mặc định là link workers.dev hiện tại).
-Mật khẩu quản trị vẫn nằm trên Cloudflare (`wrangler secret`), GitHub không cần biết.
+Xem tiến trình ở tab **Deployments** của worker. Node.js 24 được chọn qua file `.node-version`; link web lấy từ `.env.production`.
+Mật khẩu quản trị vẫn nằm trong secret của worker, không có trên GitHub.
 
 ### Deploy bằng tay từ máy
 

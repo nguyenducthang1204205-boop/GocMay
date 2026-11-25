@@ -44,6 +44,8 @@ next-env.d.ts
 /data/
 
 !.env.example
+# Chỉ chứa giá trị công khai (link web) — cần có trên GitHub để Cloudflare build đúng
+!.env.production
 
 # Cloudflare (OpenNext / wrangler)
 /.open-next/
