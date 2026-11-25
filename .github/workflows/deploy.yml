@@ -1,0 +1,53 @@
+# Tự động deploy lên Cloudflare mỗi khi đẩy code lên nhánh main.
+# Chạy đúng lệnh `npm run cf:deploy` như trên máy (xem scripts/cloudflare.mjs).
+#
+# Cần 2 secret trong GitHub → Settings → Secrets and variables → Actions:
+#   CLOUDFLARE_API_TOKEN   token tạo từ mẫu "Edit Cloudflare Workers" + quyền "D1: Edit"
+#   CLOUDFLARE_ACCOUNT_ID  Account ID trong trang tổng quan Cloudflare
+# Tuỳ chọn (tab Variables): SITE_URL — tên miền web, mặc định là link workers.dev hiện tại.
+name: Deploy Cloudflare
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["**.md", ".claude/**"]
+  workflow_dispatch: # cho phép bấm "Run workflow" để deploy lại bằng tay
+
+# Không cho hai lần deploy chạy chồng nhau; lần mới chờ lần cũ xong
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      NEXT_PUBLIC_SITE_URL: ${{ vars.SITE_URL || 'https://goc-may.nguyenducthang1204205.workers.dev' }}
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Kiểm tra secret
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Thiếu secret CLOUDFLARE_API_TOKEN hoặc CLOUDFLARE_ACCOUNT_ID (xem đầu file deploy.yml)."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      # Node 24: script deploy dùng node:sqlite và chạy thẳng file .ts
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build và deploy
+        run: npm run cf:deploy

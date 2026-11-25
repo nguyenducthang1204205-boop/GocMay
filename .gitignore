@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# dữ liệu database + ảnh tải lên (sao lưu riêng)
+/data/
+
+!.env.example
+
+# Cloudflare (OpenNext / wrangler)
+/.open-next/
+/.wrangler/
+.dev.vars*
+*.cf-hidden

@@ -20,6 +20,7 @@ Nếu chưa có file `.env.local`, sao chép từ `.env.example` và điền gi�
 
 | Mục | Hiển thị ở đâu trên web |
 | --- | --- |
+| Ảnh trang chủ (collage đầu trang, dải ảnh chạy ngang, ảnh bìa từng vibe — để trống thì tự lấy ảnh portfolio) | Trang chủ |
 | Photographer (thêm/sửa/xoá, ảnh, hạng, giá, phong cách, dịch vụ, lịch, Zalo/Messenger/Instagram/mã QR riêng) | Trang chủ, /photographer |
 | Gói chụp | /bang-gia (mục Gói chụp) |
 | Đồ bán kèm | /bang-gia (mục Đồ bán kèm) |
@@ -58,7 +59,22 @@ npm run cf:deploy        # build và đưa web lên — link *.workers.dev hiệ
 
 Sau khi có link, ghi tên miền vào file `.env.production` (`NEXT_PUBLIC_SITE_URL=https://…`) rồi deploy lại để sitemap/ảnh chia sẻ dùng đúng địa chỉ.
 
-### Các lần sau
+### Tự deploy từ GitHub
+
+Mỗi lần đẩy code lên nhánh `main`, GitHub Actions (`.github/workflows/deploy.yml`) tự chạy `npm run cf:deploy`.
+Xem tiến trình ở tab **Actions** của repo; muốn deploy lại mà không sửa code thì bấm **Run workflow**.
+
+Cài một lần — vào repo GitHub → **Settings → Secrets and variables → Actions → New repository secret**:
+
+| Secret | Lấy ở đâu |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare → My Profile → API Tokens → Create Token → mẫu **Edit Cloudflare Workers**, thêm quyền **Account · D1 · Edit** |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare → Workers & Pages → cột phải, mục **Account ID** |
+
+Đổi tên miền: thêm biến `SITE_URL` ở tab **Variables** (mặc định là link workers.dev hiện tại).
+Mật khẩu quản trị vẫn nằm trên Cloudflare (`wrangler secret`), GitHub không cần biết.
+
+### Deploy bằng tay từ máy
 
 ```bash
 npm run cf:deploy        # deploy code mới — nội dung sửa trong /admin được giữ nguyên

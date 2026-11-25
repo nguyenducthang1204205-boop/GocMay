@@ -1,0 +1,34 @@
+// Cấu hình Cloudflare Workers. Tài nguyên (D1, R2) được tạo bằng `npm run cf:setup`.
+// Xem hướng dẫn đầy đủ trong README — mục "Triển khai lên Cloudflare".
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "goc-may",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": { "enabled": true },
+  // Web chạy ở https://goc-may.<tài-khoản>.workers.dev. Gắn tên miền riêng: thêm "routes".
+  "workers_dev": true,
+  "preview_urls": false,
+
+  // Worker tự gọi chính nó để làm mới trang đã cache
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "goc-may" }],
+
+  // Một database D1 dùng cho cả dữ liệu web (DB) và bảng tag cache của Next.js.
+  // database_id được `npm run cf:setup` điền tự động.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "goc-may-db", "database_id": "e37bba32-8688-44ea-b1b0-609204f41108" },
+    { "binding": "NEXT_TAG_CACHE_D1", "database_name": "goc-may-db", "database_id": "e37bba32-8688-44ea-b1b0-609204f41108" }
+  ],
+
+  "r2_buckets": [
+    // Ảnh tải lên từ trang quản trị, phục vụ qua /uploads/<tên>
+    { "binding": "MEDIA", "bucket_name": "goc-may-media" },
+    // Bộ nhớ đệm trang của Next.js
+    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "goc-may-cache" }
+  ]
+}
