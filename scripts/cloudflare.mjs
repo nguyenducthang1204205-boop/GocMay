@@ -67,10 +67,17 @@ function readDotEnv(file) {
   return out;
 }
 
+/** Vài dòng cuối của output lệnh — để hiện lỗi gốc từ wrangler */
+const tail = (res, n = 15) => `${res.stderr}\n${res.stdout}`.trim().split(/\r?\n/).slice(-n).join("\n");
+
 function ensureLogin() {
   const res = wrangler(["whoami"], { capture: true });
-  if (!res.ok || /not authenticated/i.test(res.stdout + res.stderr)) {
-    fail("Chưa đăng nhập Cloudflare. Chạy: npx wrangler login");
+  if (!res.ok || /not authenticated|not logged in/i.test(res.stdout + res.stderr)) {
+    fail(
+      process.env.CLOUDFLARE_API_TOKEN
+        ? `API token Cloudflare không dùng được (sai, hết hạn hoặc thiếu quyền):\n${tail(res)}`
+        : "Chưa đăng nhập Cloudflare. Chạy: npx wrangler login",
+    );
   }
 }
 
@@ -137,7 +144,12 @@ function remoteHasData(target) {
   const res = wrangler(["d1", "execute", DB_NAME, target, "--json", "--command", "SELECT COUNT(*) AS n FROM settings"], {
     capture: true,
   });
-  if (!res.ok) return false; // chưa có bảng
+  if (!res.ok) {
+    if (/no such table/i.test(res.stdout + res.stderr)) return false; // database mới, chưa có bảng
+    // Lỗi khác (mạng, thiếu quyền D1…) KHÔNG có nghĩa là database trống — dừng hẳn,
+    // tránh khuyên chạy cf:db:push làm ghi đè dữ liệu thật
+    fail(`Không đọc được database ${DB_NAME} — kiểm tra kết nối và quyền "D1: Edit" của token:\n${tail(res)}`);
+  }
   try {
     return Number(JSON.parse(res.stdout)[0].results[0].n) > 0;
   } catch {
